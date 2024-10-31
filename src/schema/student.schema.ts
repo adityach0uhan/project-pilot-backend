@@ -31,6 +31,6 @@ const studentSchema = new Schema<IStudent>(
     }
 );
 
-const Student = model<IStudent>('Student', studentSchema);
+const StudentModel = model<IStudent>('Student', studentSchema);
 
-export default Student;
+export default StudentModel;
