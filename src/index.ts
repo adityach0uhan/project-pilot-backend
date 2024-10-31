@@ -1,6 +1,7 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import connectDataBase from './database/db.config.js';
+import authRouter from './routes/auth.router.js';
 import 'dotenv/config';
 
 const app: Application = express();
@@ -20,18 +21,32 @@ const corsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 };
+
 app.use(cors(corsOptions));
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello, world!');
 });
 
-let PORT = process.env.PORT || 5000;
+app.use('/auth', authRouter);
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error'
+    });
+});
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
-    await connectDataBase();
-    console.log(`Server is running on http://localhost:${PORT}`);
+    try {
+        await connectDataBase();
+        console.log(`Server is running on http://localhost:${PORT}`);
+    } catch (error) {
+        console.error('Database connection failed:', error);
+    }
 });
