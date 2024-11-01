@@ -121,3 +121,44 @@ export const teacherOtpGenerate = async (
         });
     }
 };
+
+export const teacherForgetPassword = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        const teacher = await TeacherModel.findOne({ email });
+        if (otp.length !== 6) {
+            res.status(400).json({ message: '6 Digit OTP is Required' });
+            return;
+        }
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return;
+        }
+        if (teacher.otp !== otp) {
+            res.status(400).json({ message: 'Invalid OTP' });
+            return;
+        }
+        if (new Date() > teacher.otpExpiry!) {
+            res.status(400).json({ message: 'OTP expired' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        teacher.password = hashedPassword;
+        teacher.otp = '';
+        teacher.otpExpiry = undefined;
+        await teacher.save();
+        res.status(200).json({
+            message:
+                'Password reset successfully Login with your new password and correct email'
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
