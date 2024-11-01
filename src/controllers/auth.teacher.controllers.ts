@@ -46,3 +46,48 @@ export const teacherRegister = async (
         });
     }
 };
+
+export const teacherLogin = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { email, password } = req.body;
+        const teacher = await TeacherModel.findOne({ email });
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return; // Early return
+        }
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            teacher.password
+        );
+        if (!isPasswordValid) {
+            res.status(401).json({ message: 'Invalid password' });
+            return;
+        }
+        const token = jwt.sign(
+            {
+                id: teacher._id,
+                email: teacher.email,
+                name: teacher.name,
+                role: teacher.role
+            },
+            process.env.JWT_SECRET_KEY!,
+            { expiresIn: '1d' }
+        );
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        })
+            .status(200)
+            .json({ message: 'Logged in successfully' });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
