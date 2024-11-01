@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import StudentModel from '../schema/student.schema.js';
 import TeacherModel from '../schema/teacher.schema.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -162,3 +161,8 @@ export const teacherForgetPassword = async (
         });
     }
 };
+
+export const teacherResetPassword = async (
+    req: Request,
+    res: Response
+): Promise<void> => {};
