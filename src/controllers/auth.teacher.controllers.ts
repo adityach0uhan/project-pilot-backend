@@ -91,3 +91,33 @@ export const teacherLogin = async (
         });
     }
 };
+
+export const teacherOtpGenerate = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { email } = req.body;
+        const teacher = await TeacherModel.findOne({ email });
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return;
+        }
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        await sendEmail(
+            email,
+            'Student Project Manager!  Password reset OTP ',
+            `Your OTP is ${otp} , will be expired within 5 minutes kindly ignore if you didn't request it`
+        );
+        teacher.otp = otp.toString();
+        teacher.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+        await teacher.save();
+
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
