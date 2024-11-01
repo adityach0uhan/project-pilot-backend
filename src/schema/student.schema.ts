@@ -11,6 +11,8 @@ export interface IStudent extends Document {
     classRollNumber: string;
     enrollmentNumber: string;
     universityRollNumber: string;
+    otp?: string;
+    otpExpiry?: Date;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -24,7 +26,9 @@ const studentSchema = new Schema<IStudent>(
         semester: { type: Number, required: true },
         enrollmentNumber: { type: String, required: true, unique: true },
         classRollNumber: { type: String, required: true, unique: true },
-        universityRollNumber: { type: String, required: true, unique: true }
+        universityRollNumber: { type: String, required: true, unique: true },
+        otp: { type: String, required: false },
+        otpExpiry: { type: Date, required: false }
     },
     {
         timestamps: true

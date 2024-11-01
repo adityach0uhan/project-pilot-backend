@@ -10,6 +10,8 @@ export interface ITeacher extends Document {
     role: string;
     employeeId: string;
     semester: number;
+    otp?: string;
+    otpExpiry?: Date;
 }
 
 const teacherSchema = new Schema<ITeacher>(
@@ -22,7 +24,9 @@ const teacherSchema = new Schema<ITeacher>(
         designation: { type: String, required: true },
         role: { type: String, required: true, default: 'teacher' },
         semester: { type: Number, required: true },
-        employeeId: { type: String, required: true, unique: true }
+        employeeId: { type: String, required: true, unique: true },
+        otp: { type: String, required: false },
+        otpExpiry: { type: Date, required: false }
     },
     {
         timestamps: true
