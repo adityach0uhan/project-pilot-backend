@@ -6,9 +6,10 @@ export interface IGroup extends Document {
     members: Schema.Types.ObjectId[];
     project: Schema.Types.ObjectId;
     createdBy: Schema.Types.ObjectId;
-    joiningCode: string;
+    inviteCode: string;
     groupleader: Schema.Types.ObjectId;
     createdAt?: Date;
+    semester: number;
 }
 
 const groupSchema = new Schema<IGroup>(
@@ -32,7 +33,8 @@ const groupSchema = new Schema<IGroup>(
             ref: 'Student',
             required: true
         },
-        joiningCode: { type: String, required: true },
+        inviteCode: { type: String, required: true },
+        semester: { type: Number, required: true },
         groupleader: {
             type: Schema.Types.ObjectId,
             ref: 'Student',

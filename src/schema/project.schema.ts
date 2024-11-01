@@ -12,6 +12,7 @@ export interface IProject extends Document {
     createdAt?: Date;
     progress?: number;
     deadline?: Date;
+    semester: number;
 }
 
 const projectSchema = new Schema<IProject>(
@@ -32,6 +33,7 @@ const projectSchema = new Schema<IProject>(
         },
         progress: { type: Number },
         deadline: { type: Date },
+        semester: { type: Number },
         projectMembers: [
             {
                 type: Schema.Types.ObjectId,
