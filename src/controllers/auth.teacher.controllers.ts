@@ -68,15 +68,13 @@ export const teacherLogin = async (
         const token = jwt.sign(
             {
                 id: teacher._id,
-                email: teacher.email,
-                name: teacher.name,
                 role: teacher.role
             },
             process.env.JWT_SECRET_KEY!,
             { expiresIn: '1d' }
         );
 
-        res.cookie('token', token, {
+        res.cookie('student-pro-manager-token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
@@ -119,7 +117,7 @@ export const teacherOtpGenerate = async (
             error: error.message
         });
     }
-};
+}; //TODO:Create OTP Generation Limit
 
 export const teacherForgetPassword = async (
     req: Request,
@@ -162,7 +160,33 @@ export const teacherForgetPassword = async (
     }
 };
 
-export const teacherResetPassword = async (
+export const teacherChangePassword = async (
     req: Request,
     res: Response
-): Promise<void> => {};
+): Promise<void> => {
+    try {
+        const { email, oldPassword, newPassword } = req.body;
+        const teacher = await TeacherModel.findOne({ email });
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return;
+        }
+        const isPasswordValid = await bcrypt.compare(
+            oldPassword,
+            teacher.password
+        );
+        if (!isPasswordValid) {
+            res.status(400).json({ message: 'Invalid old password' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        teacher.password = hashedPassword;
+        await teacher.save();
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
