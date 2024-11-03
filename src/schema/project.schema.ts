@@ -5,7 +5,7 @@ export interface IProject extends Document {
     description: string;
     projectType: string;
     projectStatus: string;
-    projectMembers: Schema.Types.ObjectId[];
+    Group: Schema.Types.ObjectId;
     GroupNumber?: number;
     leader?: Schema.Types.ObjectId;
     createdBy?: Schema.Types.ObjectId;
@@ -34,13 +34,11 @@ const projectSchema = new Schema<IProject>(
         progress: { type: Number },
         deadline: { type: Date },
         semester: { type: Number },
-        projectMembers: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: 'Student',
-                required: true
-            }
-        ],
+        Group: {
+            type: Schema.Types.ObjectId,
+            ref: 'Group',
+            required: true
+        },
         GroupNumber: { type: Number }
     },
 
