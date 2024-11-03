@@ -2,12 +2,16 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import connectDataBase from './database/db.config.js';
 import authRouter from './routes/auth.router.js';
+import projectRouter from './routes/project.router.js';
 import 'dotenv/config';
+import cookieParser from 'cookie-parser';
+import groupRouter from './routes/group.router.js';
 
 const app: Application = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 const corsOptions = {
     origin: function (
@@ -33,6 +37,8 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/projects', projectRouter);
+app.use('/group', groupRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);

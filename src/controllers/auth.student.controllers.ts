@@ -72,21 +72,19 @@ export const studentLogin = async (
         const token = jwt.sign(
             {
                 id: student._id,
-                email: student.email,
-                name: student.name,
                 role: student.role
             },
             process.env.JWT_SECRET_KEY!,
-            { expiresIn: '1d' }
+            { expiresIn: '15d' }
         );
 
-        res.cookie('token', token, {
+        res.cookie('student_project_manager_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         })
             .status(200)
-            .json({ message: 'Logged in successfully' });
+            .json({ message: 'Logged in successfully', data: student });
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',
@@ -123,7 +121,8 @@ export const studentOtpGenerate = async (
             error: error.message
         });
     }
-};
+}; //TODO:Create OTP Generation Limit
+
 export const studentForgetPassword = async (
     req: Request,
     res: Response
@@ -164,7 +163,33 @@ export const studentForgetPassword = async (
     }
 };
 
-export const studentResetPassword = async (
+export const studentChangePassword = async (
     req: Request,
     res: Response
-): Promise<void> => {};
+): Promise<void> => {
+    try {
+        const { email, oldPassword, newPassword } = req.body;
+        const student = await StudentModel.findOne({ email });
+        if (!student) {
+            res.status(404).json({ message: 'Student not found' });
+            return;
+        }
+        const isPasswordValid = await bcrypt.compare(
+            oldPassword,
+            student.password
+        );
+        if (!isPasswordValid) {
+            res.status(401).json({ message: 'Invalid password' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        student.password = hashedPassword;
+        await student.save();
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
