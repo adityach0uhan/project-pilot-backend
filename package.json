@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "start": "node ./dist/index.js",
-    "server": "nodemon ./dist/index.js",
-    "dev": "concurrently \"npm run watch\" \"npm run server \"",
-    "watch": "tsc -w",
-    "build": "tsc"
-  },
+ "scripts": {
+  "start": "node ./dist/index.js",
+  "server": "nodemon ./dist/index.js",
+  "dev": "concurrently \"npm run watch\" \"npm run server\"",
+  "watch": "tsc -w",
+  "build": "tsc"
+}
+,
   "keywords": [],
   "author": "",
   "license": "ISC",
