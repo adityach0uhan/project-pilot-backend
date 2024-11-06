@@ -11,9 +11,6 @@ yarn-error.log*
 # Environment variables
 .env
 
-# Build output
-dist/
-build/
 
 # IDE specific files
 .vscode/
