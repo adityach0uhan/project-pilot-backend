@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "Node16",
-    "outDir": "./dist",
-    "rootDir": "./src",  
-    "moduleResolution": "Node16",
-    "strict": true,
-    "esModuleInterop": true,
-    "types": ["node"],
-    "lib": ["es6", "dom"]
+    "target": "es2020",                // Aligning with your target
+    "module": "Node16",              // CommonJS is standard for Node.js
+    "outDir": "./dist",                // Output to the 'dist' folder
+    "rootDir": "./src",                // Sources are in 'src'
+    "moduleResolution": "Node16",      // Node 16 module resolution
+    "strict": true,                    // Enable all strict type checks
+    "esModuleInterop": true,           // Interoperability between CommonJS and ES Modules
+    "types": ["node"],                 // Use Node.js type definitions
+    "lib": ["es2020", "dom"]           // Target ES2020 and include DOM types (if needed)
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules"] 
+  "include": ["src/**/*.ts"],          // Include all TypeScript files in 'src'
+  "exclude": ["dist", "node_modules"]  // Exclude 'dist' and 'node_modules'
 }
