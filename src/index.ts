@@ -18,7 +18,8 @@ const corsOptions = {
         origin: string | undefined,
         callback: (err: Error | null, allow?: boolean) => void
     ) {
-        const allowedOrigins = ['http://localhost:3000', 'http://example2.com'];
+        const allowedOrigins = ['http://localhost:3000',
+            'http://example2.com'];
         if (allowedOrigins.indexOf(origin || '') !== -1 || !origin) {
             callback(null, true);
         } else {

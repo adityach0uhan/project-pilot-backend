@@ -82,9 +82,17 @@ export const studentLogin = async (
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
-        })
-            .status(200)
-            .json({ message: 'Logged in successfully', data: student });
+        });
+        const {
+            password: _,
+            otp,
+            otpExpiry,
+            ...studentData
+        } = student.toObject();
+        res.status(200).json({
+            message: 'Logged in successfully',
+            data: studentData
+        });
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',
