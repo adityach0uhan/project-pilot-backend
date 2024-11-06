@@ -49,18 +49,19 @@ export const studentRegister = async (
         });
     }
 };
-
 export const studentLogin = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
         const { email, password } = req.body;
+
         const student = await StudentModel.findOne({ email });
         if (!student) {
             res.status(404).json({ message: 'Student not found' });
             return;
         }
+
         const isPasswordValid = await bcrypt.compare(
             password,
             student.password
@@ -69,11 +70,9 @@ export const studentLogin = async (
             res.status(401).json({ message: 'Invalid password' });
             return;
         }
+
         const token = jwt.sign(
-            {
-                id: student._id,
-                role: student.role
-            },
+            { id: student._id, role: student.role },
             process.env.JWT_SECRET_KEY!,
             { expiresIn: '15d' }
         );
@@ -83,14 +82,16 @@ export const studentLogin = async (
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         });
+
         const {
             password: _,
             otp,
             otpExpiry,
             ...studentData
-        } = student.toObject();
+        } = await student.toObject();
+
         res.status(200).json({
-            message: 'Logged in successfully',
+            message: 'Student Logged in successfully',
             data: studentData
         });
     } catch (error: any) {
