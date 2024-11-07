@@ -20,13 +20,16 @@ const corsOptions = {
         callback: (err: Error | null, allow?: boolean) => void
     ) {
         const allowedOrigins = [
-            process.env.FRONTEND_URL || 'http://localhost:3000'
+            process.env.FRONTEND_URL ||
+                'http://localhost:3000' ||
+                'http://localhost:3000/'
         ];
-
-        if (allowedOrigins.includes(origin || '')) {
+        if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            callback(
+                new Error('CORS Error: This origin is not allowed by CORS.')
+            );
         }
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],

@@ -3,10 +3,8 @@ import jwt from 'jsonwebtoken';
 const router: Router = Router();
 
 router.get('/verify', async (req: Request, res: Response): Promise<any> => {
-    const token = req.cookies.student_project_manager_token;
+    const token = await req.cookies.student_project_manager_token;
     const secret = process.env.JWT_SECRET_KEY!;
-    console.log('Verify Route Token: ', token);
-    console.log('Verify Route Secret: ', secret);
 
     if (!token) {
         return res.status(401).json({
@@ -16,8 +14,6 @@ router.get('/verify', async (req: Request, res: Response): Promise<any> => {
 
     try {
         const decoded = jwt.verify(token, secret);
-        console.log('Decoded token:', decoded);
-
         return res.status(200).json({
             message: 'Token verified successfully.',
             data: decoded
