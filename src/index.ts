@@ -20,9 +20,7 @@ const corsOptions = {
         callback: (err: Error | null, allow?: boolean) => void
     ) {
         const allowedOrigins = [
-            process.env.FRONTEND_URL ||
-                'http://localhost:3000' ||
-                'http://localhost:3000/'
+            process.env.FRONTEND_URL || 'http://localhost:3000'
         ];
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
