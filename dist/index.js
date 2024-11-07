@@ -14,7 +14,7 @@ app.use(cookieParser());
 const corsOptions = {
     origin: function (origin, callback) {
         const allowedOrigins = [
-            process.env.FRONTEND_URL || 'http://localhost:3000' || '*'
+            process.env.FRONTEND_URL || 'http://localhost:3000'
         ];
         if (allowedOrigins.includes(origin || '')) {
             callback(null, true);
