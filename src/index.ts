@@ -23,8 +23,10 @@ const corsOptions = {
             process.env.FRONTEND_URL || 'http://localhost:3000'
         ];
         if (!origin || allowedOrigins.includes(origin)) {
+            console.log('CORS Error: This origin is allowed by CORS.');
             callback(null, true);
         } else {
+            console.log('CORS Error: This origin is not allowed by CORS.');
             callback(
                 new Error('CORS Error: This origin is not allowed by CORS.')
             );
