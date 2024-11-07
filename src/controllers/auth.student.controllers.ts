@@ -79,7 +79,7 @@ export const studentLogin = async (
 
         res.cookie('student_project_manager_token', token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             maxAge: 15 * 24 * 60 * 60 * 1000,
             sameSite: 'none'
         })
