@@ -6,6 +6,7 @@ import projectRouter from './routes/project.router.js';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import groupRouter from './routes/group.router.js';
+import verifyToken from './routes/token.verification.js';
 
 const app: Application = express();
 
@@ -18,9 +19,11 @@ const corsOptions = {
         origin: string | undefined,
         callback: (err: Error | null, allow?: boolean) => void
     ) {
-        const allowedOrigins = ['http://localhost:3000',
-            'http://example2.com'];
-        if (allowedOrigins.indexOf(origin || '') !== -1 || !origin) {
+        const allowedOrigins = [
+            process.env.FRONTEND_URL || 'http://localhost:3000' || '*'
+        ];
+
+        if (allowedOrigins.includes(origin || '')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -40,6 +43,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/auth', authRouter);
 app.use('/projects', projectRouter);
 app.use('/group', groupRouter);
+app.use('/token', verifyToken);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);

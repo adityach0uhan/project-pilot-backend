@@ -46,17 +46,20 @@ export const studentLogin = async (req, res) => {
             res.status(401).json({ message: 'Invalid password' });
             return;
         }
-        const token = jwt.sign({
-            id: student._id,
-            role: student.role
-        }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
+        const token = jwt.sign({ id: student._id, role: student.role }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
         res.cookie('student_project_manager_token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict'
         })
             .status(200)
-            .json({ message: 'Logged in successfully', data: student });
+            .json({
+            message: 'Student Logged in successfully',
+            data: student,
+            success: true,
+            status: 200,
+            token
+        });
     }
     catch (error) {
         res.status(500).json({
