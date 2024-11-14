@@ -49,8 +49,9 @@ export const studentLogin = async (req, res) => {
         const token = jwt.sign({ id: student._id, role: student.role }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
         res.cookie('student_project_manager_token', token, {
             httpOnly: true,
-            secure: false, // true in production, false in development
-            maxAge: 15 * 24 * 60 * 60 * 1000 // 15 days expiration
+            secure: true,
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            sameSite: 'none'
         })
             .status(200)
             .json({
