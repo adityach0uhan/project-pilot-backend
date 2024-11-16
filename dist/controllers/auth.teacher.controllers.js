@@ -48,14 +48,20 @@ export const teacherLogin = async (req, res) => {
         const token = jwt.sign({
             id: teacher._id,
             role: teacher.role
-        }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
-        res.cookie('student-pro-manager-token', token, {
+        }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
+        res.cookie('student_project_manager_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            secure: true,
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            sameSite: 'none'
         })
             .status(200)
-            .json({ message: 'Logged in successfully' });
+            .json({
+            message: 'Logged in successfully',
+            status: 200,
+            success: true,
+            data: teacher
+        });
     }
     catch (error) {
         res.status(500).json({
