@@ -24,7 +24,12 @@ export const studentRegister = async (req, res) => {
             universityRollNumber
         });
         const { password: _, ...studentData } = student.toObject();
-        res.status(201).json({ student: studentData });
+        res.status(201).json({
+            Student_Data: studentData,
+            message: 'Student registered successfully',
+            success: true,
+            status: 201
+        });
     }
     catch (error) {
         res.status(500).json({
