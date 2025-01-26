@@ -23,7 +23,12 @@ export const teacherRegister = async (req, res) => {
             semester
         });
         const { password: _, ...teacherData } = teacher.toObject();
-        res.status(201).json({ teacher: teacherData });
+        res.status(201).json({
+            teacher: teacherData,
+            success: true,
+            status: 201,
+            message: 'Teacher registered successfully'
+        });
     }
     catch (error) {
         res.status(500).json({

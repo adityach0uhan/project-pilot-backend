@@ -11,7 +11,13 @@ const studentSchema = new Schema({
     classRollNumber: { type: String, required: true, unique: true },
     universityRollNumber: { type: String, required: true, unique: true },
     otp: { type: String, required: false },
-    otpExpiry: { type: Date, required: false }
+    otpExpiry: { type: Date, required: false },
+    teamId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Group',
+        required: false,
+        default: null
+    }
 }, {
     timestamps: true
 });

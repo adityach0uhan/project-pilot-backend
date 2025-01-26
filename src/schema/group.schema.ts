@@ -8,8 +8,8 @@ export interface IGroup extends Document {
     createdBy: Schema.Types.ObjectId;
     inviteCode: string;
     groupleader: Schema.Types.ObjectId;
-    createdAt?: Date;
     semester: number;
+    pendingRequests?: Schema.Types.ObjectId[];
 }
 
 const groupSchema = new Schema<IGroup>(
@@ -39,7 +39,13 @@ const groupSchema = new Schema<IGroup>(
             type: Schema.Types.ObjectId,
             ref: 'Student',
             required: true
-        }
+        },
+        pendingRequests: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Student'
+            }
+        ]
     },
 
     {

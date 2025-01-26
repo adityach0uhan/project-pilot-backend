@@ -25,7 +25,13 @@ const groupSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Student',
         required: true
-    }
+    },
+    pendingRequests: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Student'
+        }
+    ]
 }, {
     timestamps: true
 });

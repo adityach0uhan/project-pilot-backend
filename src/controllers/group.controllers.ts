@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import GroupModel from '../schema/group.schema.js';
 import { generateUniqueInviteCodes } from '../utils/generateUniqueInviteCodes.js';
-import exp from 'constants';
+import StudentModel from '../schema/student.schema.js';
 
 export const createNewGroup = async (
     req: Request,
@@ -21,6 +21,16 @@ export const createNewGroup = async (
 
         if (!name || !groupNumber || !createdBy || !groupleader) {
             res.status(400).json({ message: 'Missing required fields' });
+            return;
+        }
+
+        const alreadyPartOfGroup: any = await StudentModel.findById({
+            groupleader
+        });
+        if (alreadyPartOfGroup.teamId) {
+            res.status(400).json({
+                message: 'User is already part of a group'
+            });
             return;
         }
 

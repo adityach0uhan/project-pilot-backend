@@ -22,7 +22,12 @@ const projectSchema = new Schema({
         ref: 'Group',
         required: true
     },
-    GroupNumber: { type: Number }
+    GroupNumber: { type: Number },
+    status: {
+        type: String,
+        enum: ['Not Submitted', 'Submitted', 'Reviewed', 'Approved'],
+        default: 'Not Submitted'
+    }
 }, {
     timestamps: true
 });

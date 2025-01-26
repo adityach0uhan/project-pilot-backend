@@ -37,7 +37,12 @@ export const teacherRegister = async (
             semester
         });
         const { password: _, ...teacherData } = teacher.toObject();
-        res.status(201).json({ teacher: teacherData });
+        res.status(201).json({
+            teacher: teacherData,
+            success: true,
+            status: 201,
+            message: 'Teacher registered successfully'
+        });
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',

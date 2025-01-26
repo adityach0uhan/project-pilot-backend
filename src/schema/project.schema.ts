@@ -11,6 +11,7 @@ export interface IProject extends Document {
     createdBy?: Schema.Types.ObjectId;
     createdAt?: Date;
     progress?: number;
+    status?: string;
     deadline?: Date;
     semester: number;
 }
@@ -39,7 +40,12 @@ const projectSchema = new Schema<IProject>(
             ref: 'Group',
             required: true
         },
-        GroupNumber: { type: Number }
+        GroupNumber: { type: Number },
+        status: {
+            type: String,
+            enum: ['Not Submitted', 'Submitted', 'Reviewed', 'Approved'],
+            default: 'Not Submitted'
+        }
     },
 
     {
