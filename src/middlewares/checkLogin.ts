@@ -18,7 +18,11 @@ export const checkLogin = async (
     const token: any = await req.cookies.student_project_manager_token;
 
     if (!token) {
-        res.status(401).json({ message: 'Unauthorized: No Token found' });
+        res.status(401).json({
+            message: 'Unauthorized! No Auth Token found',
+            token: token
+        });
+        return;
     }
 
     try {
