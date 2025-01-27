@@ -26,7 +26,8 @@ const groupSchema = new Schema<IGroup>(
         project: {
             type: Schema.Types.ObjectId,
             ref: 'Project',
-            required: true
+            required: false,
+            default: null
         },
         createdBy: {
             type: Schema.Types.ObjectId,

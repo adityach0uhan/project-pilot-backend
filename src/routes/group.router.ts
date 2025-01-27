@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import {
     createNewGroup,
-    joinGroup,
     getGroupInfo,
     getAllGroups,
     getGroup,
     updateGroup,
     deleteGroup,
-    kickMember
+    kickMember,
+    requestToJoinGroup,
+    makeGroupRequestAcceptOrReject
 } from '../controllers/group.controllers.js';
 import { checkLogin } from '../middlewares/checkLogin.js';
 import { checkTeacher } from '../middlewares/checkTeacher.js';
@@ -15,9 +16,10 @@ import { checkTeacher } from '../middlewares/checkTeacher.js';
 const router = Router();
 
 router.post('/create', createNewGroup);
-router.post('/join/:inviteCode', joinGroup);
+router.post('/requesttojoin/:inviteCode', requestToJoinGroup);
+router.post('/managejoinrequests', makeGroupRequestAcceptOrReject);
 router.put('/:groupId/kick/:memberId', kickMember);
-router.get('/groupInfo', checkLogin, getGroupInfo);
+router.post('/groupInfo', getGroupInfo);
 router.get('/getAllGroups', getAllGroups);
 router.get('/:groupId', getGroup);
 router.put('/:groupId', updateGroup);
