@@ -1,19 +1,18 @@
+import mongoose from 'mongoose';
 import GroupModel from '../schema/group.schema.js';
 import { generateUniqueInviteCodes } from '../utils/generateUniqueInviteCodes.js';
 import StudentModel from '../schema/student.schema.js';
 export const createNewGroup = async (req, res, next) => {
     try {
-        const { name, groupNumber, members, project, createdBy, groupleader, semester } = req.body;
+        const { name, groupNumber, members, createdBy, groupleader, semester } = req.body;
         if (!name || !groupNumber || !createdBy || !groupleader) {
             res.status(400).json({ message: 'Missing required fields' });
             return;
         }
-        const alreadyPartOfGroup = await StudentModel.findById({
-            groupleader
-        });
-        if (alreadyPartOfGroup.teamId) {
+        if (!mongoose.isValidObjectId(createdBy) ||
+            !mongoose.isValidObjectId(groupleader)) {
             res.status(400).json({
-                message: 'User is already part of a group'
+                message: 'Invalid createdBy or groupleader ID'
             });
             return;
         }
@@ -22,14 +21,17 @@ export const createNewGroup = async (req, res, next) => {
             name,
             groupNumber,
             members,
-            project,
+            project: null,
             createdBy,
             inviteCode: newInviteCode,
             groupleader,
             semester
         });
         await newGroup.save();
-        res.status(201).json({ message: 'Group created successfully' });
+        res.status(201).json({
+            message: 'Group created successfully',
+            group: newGroup
+        });
     }
     catch (error) {
         res.status(500).json({
@@ -38,7 +40,7 @@ export const createNewGroup = async (req, res, next) => {
         });
     }
 };
-export const joinGroup = async (req, res, next) => {
+export const requestToJoinGroup = async (req, res, next) => {
     try {
         const { inviteCode } = req.params;
         const { userId } = req.body;
@@ -47,15 +49,88 @@ export const joinGroup = async (req, res, next) => {
             res.status(404).json({ message: 'Group not found' });
             return;
         }
+        // Check if the user is already a member
         if (group.members.includes(userId)) {
             res.status(400).json({
                 message: 'User is already a member of this group'
             });
             return;
         }
-        group.members.push(userId);
+        // Check if the user has already requested to join
+        if (group.pendingRequests?.includes(userId)) {
+            res.status(400).json({
+                message: 'User has already requested to join this group'
+            });
+            return;
+        }
+        group.pendingRequests.push(userId);
         await group.save();
-        res.status(200).json({ message: 'User joined group successfully' });
+        res.status(200).json({
+            message: 'Request to join group submitted successfully'
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+export const makeGroupRequestAcceptOrReject = async (req, res, next) => {
+    try {
+        const { userId, action, currentUserId, groupID } = req.body;
+        // Validate required fields
+        if (!userId || !action || !currentUserId || !groupID) {
+            res.status(400).json({ message: 'Missing required fields' });
+            return;
+        }
+        // Find the group
+        const group = await GroupModel.findById(groupID);
+        if (!group) {
+            res.status(404).json({ message: 'Group not found' });
+            return;
+        }
+        // Ensure the current user is the group leader
+        if (group.groupleader.toString() !== currentUserId) {
+            res.status(403).json({
+                message: 'Only the group leader can manage requests'
+            });
+            return;
+        }
+        // Check if the user is in the pending requests
+        if (!group.pendingRequests.includes(userId)) {
+            res.status(400).json({ message: 'User request not found' });
+            return;
+        }
+        if (action === 'accept') {
+            // Add user to members
+            if (group.members.includes(userId)) {
+                res.status(400).json({
+                    message: 'User is already a member of this group'
+                });
+                return;
+            }
+            group.members.push(userId);
+            // Remove user from pending requests
+            group.pendingRequests = group.pendingRequests.filter((requestId) => requestId.toString() !== userId);
+            // Update student's teamId
+            await StudentModel.findByIdAndUpdate(userId, { teamId: groupID });
+            await group.save();
+            res.status(200).json({
+                message: 'User added to the group successfully'
+            });
+        }
+        else if (action === 'reject') {
+            // Remove user from pending requests without adding to members
+            group.pendingRequests = group.pendingRequests.filter((requestId) => requestId.toString() !== userId);
+            await group.save();
+            res.status(200).json({
+                message: 'User request rejected successfully'
+            });
+        }
+        else {
+            res.status(400).json({ message: 'Invalid action' });
+        }
     }
     catch (error) {
         res.status(500).json({
@@ -67,7 +142,8 @@ export const joinGroup = async (req, res, next) => {
 export const getGroupInfo = async (req, res, next) => {
     try {
         const { userId } = req.body;
-        const group = await GroupModel.findOne({ members: userId })
+        const groupInfo = await StudentModel.findById(userId);
+        const group = await GroupModel.findOne({ _id: groupInfo.teamId })
             .select('name groupNumber project inviteCode semester createdAt updatedAt')
             .populate({
             path: 'members',

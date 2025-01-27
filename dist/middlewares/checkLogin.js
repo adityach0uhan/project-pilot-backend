@@ -2,7 +2,11 @@ import jwt from 'jsonwebtoken';
 export const checkLogin = async (req, res, next) => {
     const token = await req.cookies.student_project_manager_token;
     if (!token) {
-        res.status(401).json({ message: 'Unauthorized: No Token found' });
+        res.status(401).json({
+            message: 'Unauthorized! No Auth Token found',
+            token: token
+        });
+        return;
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);

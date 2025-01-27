@@ -41,8 +41,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/auth', authRouter);
 app.use('/projects', projectRouter);
-app.use('/group', groupRouter);
 app.use('/token', verifyToken);
+app.use('/group', groupRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {

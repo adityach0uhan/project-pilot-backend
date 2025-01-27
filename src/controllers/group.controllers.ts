@@ -1,35 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import GroupModel from '../schema/group.schema.js';
 import { generateUniqueInviteCodes } from '../utils/generateUniqueInviteCodes.js';
 import StudentModel from '../schema/student.schema.js';
-
 export const createNewGroup = async (
     req: Request,
     res: Response,
     next: NextFunction
 ): Promise<void> => {
     try {
-        const {
-            name,
-            groupNumber,
-            members,
-            project,
-            createdBy,
-            groupleader,
-            semester
-        } = req.body;
+        const { name, groupNumber, members, createdBy, groupleader, semester } =
+            req.body;
 
         if (!name || !groupNumber || !createdBy || !groupleader) {
             res.status(400).json({ message: 'Missing required fields' });
             return;
         }
 
-        const alreadyPartOfGroup: any = await StudentModel.findById({
-            groupleader
-        });
-        if (alreadyPartOfGroup.teamId) {
+        if (
+            !mongoose.isValidObjectId(createdBy) ||
+            !mongoose.isValidObjectId(groupleader)
+        ) {
             res.status(400).json({
-                message: 'User is already part of a group'
+                message: 'Invalid createdBy or groupleader ID'
             });
             return;
         }
@@ -40,7 +33,7 @@ export const createNewGroup = async (
             name,
             groupNumber,
             members,
-            project,
+            project: null,
             createdBy,
             inviteCode: newInviteCode,
             groupleader,
@@ -48,8 +41,10 @@ export const createNewGroup = async (
         });
 
         await newGroup.save();
-
-        res.status(201).json({ message: 'Group created successfully' });
+        res.status(201).json({
+            message: 'Group created successfully',
+            group: newGroup
+        });
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',
@@ -58,7 +53,7 @@ export const createNewGroup = async (
     }
 };
 
-export const joinGroup = async (
+export const requestToJoinGroup = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -67,13 +62,14 @@ export const joinGroup = async (
         const { inviteCode } = req.params;
         const { userId } = req.body;
 
-        const group = await GroupModel.findOne({ inviteCode });
+        const group: any = await GroupModel.findOne({ inviteCode });
 
         if (!group) {
             res.status(404).json({ message: 'Group not found' });
             return;
         }
 
+        // Check if the user is already a member
         if (group.members.includes(userId)) {
             res.status(400).json({
                 message: 'User is already a member of this group'
@@ -81,10 +77,99 @@ export const joinGroup = async (
             return;
         }
 
-        group.members.push(userId);
+        // Check if the user has already requested to join
+        if (group.pendingRequests?.includes(userId)) {
+            res.status(400).json({
+                message: 'User has already requested to join this group'
+            });
+            return;
+        }
+
+        group.pendingRequests.push(userId);
         await group.save();
 
-        res.status(200).json({ message: 'User joined group successfully' });
+        res.status(200).json({
+            message: 'Request to join group submitted successfully'
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+
+export const makeGroupRequestAcceptOrReject = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { userId, action, currentUserId, groupID }: any = req.body;
+
+        // Validate required fields
+        if (!userId || !action || !currentUserId || !groupID) {
+            res.status(400).json({ message: 'Missing required fields' });
+            return;
+        }
+
+        // Find the group
+        const group: any = await GroupModel.findById(groupID);
+
+        if (!group) {
+            res.status(404).json({ message: 'Group not found' });
+            return;
+        }
+
+        // Ensure the current user is the group leader
+        if (group.groupleader.toString() !== currentUserId) {
+            res.status(403).json({
+                message: 'Only the group leader can manage requests'
+            });
+            return;
+        }
+
+        // Check if the user is in the pending requests
+        if (!group.pendingRequests.includes(userId)) {
+            res.status(400).json({ message: 'User request not found' });
+            return;
+        }
+
+        if (action === 'accept') {
+            // Add user to members
+            if (group.members.includes(userId)) {
+                res.status(400).json({
+                    message: 'User is already a member of this group'
+                });
+                return;
+            }
+            group.members.push(userId);
+
+            // Remove user from pending requests
+            group.pendingRequests = group.pendingRequests.filter(
+                (requestId: any) => requestId.toString() !== userId
+            );
+
+            // Update student's teamId
+            await StudentModel.findByIdAndUpdate(userId, { teamId: groupID });
+            await group.save();
+
+            res.status(200).json({
+                message: 'User added to the group successfully'
+            });
+        } else if (action === 'reject') {
+            // Remove user from pending requests without adding to members
+            group.pendingRequests = group.pendingRequests.filter(
+                (requestId: any) => requestId.toString() !== userId
+            );
+            await group.save();
+
+            res.status(200).json({
+                message: 'User request rejected successfully'
+            });
+        } else {
+            res.status(400).json({ message: 'Invalid action' });
+        }
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',
@@ -100,8 +185,8 @@ export const getGroupInfo = async (
 ): Promise<void> => {
     try {
         const { userId } = req.body;
-
-        const group = await GroupModel.findOne({ members: userId })
+        const groupInfo: any = await StudentModel.findById(userId);
+        const group: any = await GroupModel.findOne({ _id: groupInfo.teamId })
             .select(
                 'name groupNumber project inviteCode semester createdAt updatedAt'
             )
