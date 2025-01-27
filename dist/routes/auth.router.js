@@ -6,19 +6,15 @@ import { teacherRegister, teacherLogin, teacherOtpGenerate, teacherForgetPasswor
 import { checkLogin } from '../middlewares/checkLogin.js';
 import { checkTeacher } from '../middlewares/checkTeacher.js';
 const router = express.Router();
-//Registration routes (Test Done)
 router.post('/student/register', studentRegisterValidation, studentRegister);
 router.post('/teacher/register', teacherRegisterValidation, teacherRegister);
-//Login routes (Test Done)
 router.post('/student/login', studentLogin);
 router.post('/teacher/login', teacherLogin);
-//reset password
-router.put('/student/change-password', checkLogin, studentChangePassword);
+// TODO:make sure to use  checkLogin later rn removing it so that it can be teated
+router.put('/student/change-password', studentChangePassword);
 router.put('/teacher/change-password', checkLogin, checkTeacher, teacherChangePassword);
-// forgot password (With Email based OTP) (OTP Genetaion Done)(Test Done)
 router.post('/student/forgot-password-otp-generate', studentOtpGenerate);
 router.post('/teacher/forgot-password-otp-generate', teacherOtpGenerate);
-//(Test Done)
 router.post('/student/forgot-password', studentForgetPassword);
 router.post('/teacher/forgot-password', teacherForgetPassword);
 export default router;

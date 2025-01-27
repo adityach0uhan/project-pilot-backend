@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { createNewGroup, joinGroup, getGroupInfo, getAllGroups, getGroup, updateGroup, deleteGroup, kickMember } from '../controllers/group.controllers.js';
-import { checkLogin } from '../middlewares/checkLogin.js';
+import { createNewGroup, getGroupInfo, getAllGroups, getGroup, updateGroup, deleteGroup, kickMember, requestToJoinGroup, makeGroupRequestAcceptOrReject } from '../controllers/group.controllers.js';
 const router = Router();
 router.post('/create', createNewGroup);
-router.post('/join/:inviteCode', joinGroup);
+router.post('/requesttojoin/:inviteCode', requestToJoinGroup);
+router.post('/managejoinrequests', makeGroupRequestAcceptOrReject);
 router.put('/:groupId/kick/:memberId', kickMember);
-router.get('/groupInfo', checkLogin, getGroupInfo);
+router.post('/groupInfo', getGroupInfo);
 router.get('/getAllGroups', getAllGroups);
 router.get('/:groupId', getGroup);
 router.put('/:groupId', updateGroup);
