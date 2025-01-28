@@ -28,6 +28,7 @@ export const createNewGroup = async (req, res, next) => {
             semester
         });
         await newGroup.save();
+        const updateSudentTeamId = await StudentModel.findByIdAndUpdate(newGroup.groupleader, { teamId: newGroup._id });
         res.status(201).json({
             message: 'Group created successfully',
             group: newGroup
@@ -161,12 +162,13 @@ export const getGroupInfo = async (req, res, next) => {
             res.status(404).json({ message: 'Group not found' });
             return;
         }
-        res.status(200).json({ group });
+        res.status(200).json({ groupData: group, success: true });
     }
     catch (error) {
         res.status(500).json({
             message: 'Internal server error',
-            error: error.message
+            error: error.message,
+            success: false
         });
     }
 };
