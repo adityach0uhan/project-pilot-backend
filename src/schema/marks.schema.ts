@@ -4,6 +4,7 @@ export interface IMark extends Document {
     project: Schema.Types.ObjectId;
     score: number;
     teacher: Schema.Types.ObjectId;
+    collegeId: string;
 }
 
 const markSchema = new Schema<IMark>(
