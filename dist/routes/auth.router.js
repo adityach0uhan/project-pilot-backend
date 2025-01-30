@@ -1,20 +1,27 @@
 import express from 'express';
-import { studentRegisterValidation } from '../validators/student.validator.js';
-import { teacherRegisterValidation } from '../validators/teacher.validator.js';
-import { studentRegister, studentLogin, studentForgetPassword, studentChangePassword, studentOtpGenerate } from '../controllers/auth.student.controllers.js';
-import { teacherRegister, teacherLogin, teacherOtpGenerate, teacherForgetPassword, teacherChangePassword } from '../controllers/auth.teacher.controllers.js';
-import { checkLogin } from '../middlewares/checkLogin.js';
-import { checkTeacher } from '../middlewares/checkTeacher.js';
+//TODO: Apply Validators
+// import { studentRegisterValidation } from '../validators/student.validator.js';
+// import { teacherRegisterValidation } from '../validators/teacher.validator.js';
+import { studentRegister, studentLogin, studentForgetPassword, studentChangePassword, studentOtpGenerate } from '../controllers/auth.student.controller.js';
+import { teacherRegister, teacherLogin, teacherOtpGenerate, teacherForgetPassword, teacherChangePassword } from '../controllers/auth.teacher.controller.js';
+import { collegeChangePassword, collegeForgetPassword, collegeLogin, collegeOtpGenerate, collegeRegister } from '../controllers/auth.college.controller.js';
+import { superAdminLogin, superAdminRegister } from '../controllers/super.admin.auth.controller.js';
 const router = express.Router();
-router.post('/student/register', studentRegisterValidation, studentRegister);
-router.post('/teacher/register', teacherRegisterValidation, teacherRegister);
+router.post('/student/register', studentRegister);
+router.post('/teacher/register', teacherRegister);
+router.post('/college/register', collegeRegister);
+router.post('/super-admin/register', superAdminRegister);
 router.post('/student/login', studentLogin);
 router.post('/teacher/login', teacherLogin);
-// TODO:make sure to use  checkLogin later rn removing it so that it can be teated
+router.post('/college/login', collegeLogin);
+router.post('/super-admin/login', superAdminLogin);
 router.put('/student/change-password', studentChangePassword);
-router.put('/teacher/change-password', checkLogin, checkTeacher, teacherChangePassword);
+router.put('/teacher/change-password', teacherChangePassword);
+router.put('/college/change-password', collegeChangePassword);
 router.post('/student/forgot-password-otp-generate', studentOtpGenerate);
 router.post('/teacher/forgot-password-otp-generate', teacherOtpGenerate);
+router.post('/college/forgot-password-otp-generate', collegeOtpGenerate);
 router.post('/student/forgot-password', studentForgetPassword);
 router.post('/teacher/forgot-password', teacherForgetPassword);
+router.post('/college/forgot-password', collegeForgetPassword);
 export default router;

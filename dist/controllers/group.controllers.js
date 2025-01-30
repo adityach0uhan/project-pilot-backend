@@ -50,17 +50,17 @@ export const requestToJoinGroup = async (req, res, next) => {
             res.status(404).json({ message: 'Group not found' });
             return;
         }
-        // Check if the user is already a member
         if (group.members.includes(userId)) {
-            res.status(400).json({
-                message: 'User is already a member of this group'
+            res.status(200).json({
+                message: 'User is already a member of this group',
+                success: false
             });
             return;
         }
-        // Check if the user has already requested to join
         if (group.pendingRequests?.includes(userId)) {
-            res.status(400).json({
-                message: 'User has already requested to join this group'
+            res.status(200).json({
+                message: 'User has already requested to join this group',
+                success: true
             });
             return;
         }
@@ -80,12 +80,10 @@ export const requestToJoinGroup = async (req, res, next) => {
 export const makeGroupRequestAcceptOrReject = async (req, res, next) => {
     try {
         const { userId, action, currentUserId, groupID } = req.body;
-        // Validate required fields
         if (!userId || !action || !currentUserId || !groupID) {
             res.status(400).json({ message: 'Missing required fields' });
             return;
         }
-        // Find the group
         const group = await GroupModel.findById(groupID);
         if (!group) {
             res.status(404).json({ message: 'Group not found' });
@@ -94,13 +92,17 @@ export const makeGroupRequestAcceptOrReject = async (req, res, next) => {
         // Ensure the current user is the group leader
         if (group.groupleader.toString() !== currentUserId) {
             res.status(403).json({
-                message: 'Only the group leader can manage requests'
+                message: 'Only the group leader can manage requests',
+                success: false
             });
             return;
         }
         // Check if the user is in the pending requests
         if (!group.pendingRequests.includes(userId)) {
-            res.status(400).json({ message: 'User request not found' });
+            res.status(400).json({
+                message: 'No user request found in pending list ',
+                success: false
+            });
             return;
         }
         if (action === 'accept') {
@@ -157,6 +159,10 @@ export const getGroupInfo = async (req, res, next) => {
             .populate({
             path: 'groupleader',
             select: 'name'
+        })
+            .populate({
+            path: 'pendingRequests',
+            select: 'name email'
         });
         if (!group) {
             res.status(404).json({ message: 'Group not found' });
