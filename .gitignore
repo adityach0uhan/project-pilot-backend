@@ -10,7 +10,8 @@ yarn-error.log*
 
 # Environment variables
 .env
-
+./dist
+/dist
 
 # IDE specific files
 .vscode/
