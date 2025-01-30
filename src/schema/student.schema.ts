@@ -1,47 +1,49 @@
+// student.model.ts
 import { Schema, model, Document } from 'mongoose';
 
 export interface IStudent extends Document {
     name: string;
-    profilePic: string;
     email: string;
-    department: string;
     password: string;
+    profilePic: string;
     semester: number;
+    branch: string;
+    teamId: Schema.Types.ObjectId;
+    section: string;
     role: string;
-    classRollNumber: string;
-    enrollmentNumber: string;
     universityRollNumber: string;
-    otp?: string;
-    otpExpiry?: Date;
-    teamId?: Schema.Types.ObjectId;
+    classRollNumber: string;
+    gender: string;
+    otp: string;
+    otpExpiry: Date;
+    collegeId: string;
 }
 
 const studentSchema = new Schema<IStudent>(
     {
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
-        profilePic: { type: String, required: false },
+        profilePic: { type: String, required: false, default: null },
         password: { type: String, required: true },
-        department: { type: String, required: true },
-        role: { type: String, required: true, default: 'student' },
         semester: { type: Number, required: true },
-        enrollmentNumber: { type: String, required: true, unique: true },
-        classRollNumber: { type: String, required: true, unique: true },
-        universityRollNumber: { type: String, required: true, unique: true },
-        otp: { type: String, required: false },
-        otpExpiry: { type: Date, required: false },
+        branch: { type: String, required: true },
+        role: { type: String, default: 'student' },
+        section: { type: String, required: true },
+        universityRollNumber: { type: String, required: true },
+        classRollNumber: { type: String, required: true },
+        gender: { type: String, required: true },
+        otp: { type: String, required: false, default: null },
+        otpExpiry: { type: Date, required: false, default: null },
+        collegeId: { type: String, required: true },
         teamId: {
             type: Schema.Types.ObjectId,
             ref: 'Group',
-            required: false,
-            default: null
+            default: null,
+            required: false
         }
     },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
 
 const StudentModel = model<IStudent>('Student', studentSchema);
-
 export default StudentModel;
