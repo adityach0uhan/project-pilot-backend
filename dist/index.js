@@ -3,10 +3,10 @@ import cors from 'cors';
 import connectDataBase from './database/db.config.js';
 import authRouter from './routes/auth.router.js';
 import projectRouter from './routes/project.router.js';
+import groupRouter from './routes/group.router.js';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
-import groupRouter from './routes/group.router.js';
-import verifyToken from './routes/token.verification.js';
+import verifyToken from './middlewares/verifyToken.js';
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -30,17 +30,17 @@ app.use((err, req, res, next) => {
     }
 });
 app.get('/', (req, res) => {
-    res.send('Hello, world!');
+    res.json({ message: 'Student Project Manager API' });
 });
-app.use('/auth', authRouter);
-app.use('/projects', projectRouter);
-app.use('/token', verifyToken);
-app.use('/group', groupRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
+app.use('/api/v1/:collegeId/token', verifyToken, verifyToken);
+app.use('/api/v1/:collegeId/group', verifyToken, groupRouter);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
     try {
         await connectDataBase();
-        console.log(`Server is running on http://localhost:${PORT}`);
+        console.log(`Server is live on http://localhost:${PORT}`);
     }
     catch (error) {
         console.error('Database connection failed:', error);
