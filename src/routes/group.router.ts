@@ -4,12 +4,12 @@ import {
     getGroupInfo,
     getAllGroups,
     getGroup,
-    updateGroup,
-    deleteGroup,
+    // updateGroup,
+    // deleteGroup,
     kickMember,
     requestToJoinGroup,
     makeGroupRequestAcceptOrReject
-} from '../controllers/group.controllers.js';
+} from '../controllers/group.controller.js';
 import { checkLogin } from '../middlewares/checkLogin.js';
 import { checkTeacher } from '../middlewares/checkTeacher.js';
 
@@ -22,7 +22,7 @@ router.put('/:groupId/kick/:memberId', kickMember);
 router.post('/groupInfo', getGroupInfo);
 router.get('/getAllGroups', getAllGroups);
 router.get('/:groupId', getGroup);
-router.put('/:groupId', updateGroup);
-router.delete('/:groupId', deleteGroup);
+// router.put('/:groupId', updateGroup);
+// router.delete('/:groupId', deleteGroup);
 
 export default router;
