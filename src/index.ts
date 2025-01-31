@@ -4,6 +4,7 @@ import connectDataBase from './database/db.config.js';
 import authRouter from './routes/auth.router.js';
 import projectRouter from './routes/project.router.js';
 import groupRouter from './routes/group.router.js';
+import superAdminRouter from './routes/superadmin.router.js';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import verifyToken from './middlewares/verifyToken.js';
@@ -39,6 +40,17 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+app.post('/api/v1/auth/logout', (req, res) => {
+    res.clearCookie('project_pilot_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        domain: 'localhost',
+        path: '/'
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
+});
+app.use('/api/v1/superadmin/', superAdminRouter);
 app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
 app.use('/api/v1/:collegeId/token', verifyToken, verifyToken);
 app.use('/api/v1/:collegeId/group', verifyToken, groupRouter);
