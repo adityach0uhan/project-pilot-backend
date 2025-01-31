@@ -17,6 +17,7 @@ export interface IStudent extends Document {
     otp: string;
     otpExpiry: Date;
     collegeId: string;
+    collegeName: string;
 }
 
 const studentSchema = new Schema<IStudent>(
@@ -31,6 +32,7 @@ const studentSchema = new Schema<IStudent>(
         section: { type: String, required: true },
         universityRollNumber: { type: String, required: true },
         classRollNumber: { type: String, required: true },
+        collegeName: { type: String, required: false },
         gender: { type: String, required: true },
         otp: { type: String, required: false, default: null },
         otpExpiry: { type: Date, required: false, default: null },

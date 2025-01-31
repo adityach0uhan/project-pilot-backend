@@ -14,6 +14,7 @@ export interface ITeacher extends Document {
     otpExpiry: Date;
     role: string;
     isHOD: boolean;
+    collegeName: string;
 }
 
 const teacherSchema = new Schema<ITeacher>(
@@ -29,6 +30,7 @@ const teacherSchema = new Schema<ITeacher>(
         branch: { type: String, required: true },
         collegeId: { type: String, required: true }, // Multi-tenant identifier
         gender: { type: String, required: true },
+        collegeName: { type: String, required: false },
         isHOD: { type: Boolean, required: true, default: false },
         profilePic: { type: String, required: false }
     },
