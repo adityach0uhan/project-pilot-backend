@@ -6,7 +6,7 @@ export interface IStudent extends Document {
     email: string;
     password: string;
     profilePic: string;
-    semester: number;
+    semester: string;
     branch: string;
     teamId: Schema.Types.ObjectId;
     section: string;
@@ -26,7 +26,7 @@ const studentSchema = new Schema<IStudent>(
         email: { type: String, required: true, unique: true },
         profilePic: { type: String, required: false, default: null },
         password: { type: String, required: true },
-        semester: { type: Number, required: true },
+        semester: { type: String, required: true },
         branch: { type: String, required: true },
         role: { type: String, default: 'student' },
         section: { type: String, required: true },
