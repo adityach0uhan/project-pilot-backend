@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express, { Router, Request, Response } from 'express';
 
 //TODO: Apply Validators
 // import { studentRegisterValidation } from '../validators/student.validator.js';
@@ -31,6 +31,16 @@ import {
 
 const router: Router = express.Router();
 
+router.get('/logout', (req: Request, res: Response) => {
+    res.clearCookie('project_pilot_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        domain: 'localhost',
+        path: '/'
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
+});
 router.post('/student/register', studentRegister);
 router.post('/teacher/register', teacherRegister);
 router.post('/college/register', collegeRegister);
