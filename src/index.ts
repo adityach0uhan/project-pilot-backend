@@ -7,6 +7,7 @@ import groupRouter from './routes/group.router.js';
 import superAdminRouter from './routes/superadmin.router.js';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
+import collegeRouter from './routes/college.router.js';
 import verifyToken from './middlewares/verifyToken.js';
 const app: Application = express();
 
@@ -23,7 +24,6 @@ app.use(
         credentials: true
     })
 );
-
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err.name === 'Error' && err.message.includes('CORS')) {
         res.status(403).json({ message: 'CORS Error: Access Denied' });
@@ -36,31 +36,31 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-    res.json({ message: 'Student Project Manager API' });
+    res.json({ message: 'Project Pilot API ' });
 });
 
+// combined auth routes for every user (student, teacher, college, superadmin)
 app.use('/api/v1/auth', authRouter);
-app.post('/api/v1/auth/logout', (req, res) => {
-    res.clearCookie('project_pilot_token', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        domain: 'localhost',
-        path: '/'
-    });
-    res.status(200).json({ message: 'Logged out successfully' });
-});
-app.use('/api/v1/superadmin/', superAdminRouter);
-app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
-app.use('/api/v1/:collegeId/token', verifyToken, verifyToken);
-app.use('/api/v1/:collegeId/group', verifyToken, groupRouter);
 
+//Route for college admin dashboard
+app.use('/api/v1/college', collegeRouter);
+
+//Route for super admin dashboard
+app.use('/api/v1/superadmin/', superAdminRouter);
+
+//ALL Route related to  projects
+app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
+
+//ALL Route related to  groups
+app.use('/api/v1/:collegeId/group', groupRouter);
+
+// PORT and DB connection
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
     try {
         await connectDataBase();
         console.log(`Server is live on http://localhost:${PORT}`);
-    } catch (error) {
-        console.error('Database connection failed:', error);
+    } catch (error: any) {
+        console.log('Database connection failed:', error);
     }
 });
