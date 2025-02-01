@@ -7,6 +7,16 @@ import { teacherRegister, teacherLogin, teacherOtpGenerate, teacherForgetPasswor
 import { collegeChangePassword, collegeForgetPassword, collegeLogin, collegeOtpGenerate, collegeRegister } from '../controllers/auth.college.controller.js';
 import { superAdminLogin, superAdminRegister } from '../controllers/super.admin.auth.controller.js';
 const router = express.Router();
+router.get('/logout', (req, res) => {
+    res.clearCookie('project_pilot_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        domain: 'localhost',
+        path: '/'
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
+});
 router.post('/student/register', studentRegister);
 router.post('/teacher/register', teacherRegister);
 router.post('/college/register', collegeRegister);

@@ -3,7 +3,7 @@ const groupSchema = new Schema({
     name: { type: String, required: true },
     groupNumber: { type: String, required: true },
     members: [
-        { type: Schema.Types.ObjectId, ref: 'Student', required: true }
+        { type: Schema.Types.ObjectId, ref: 'Student', required: false }
     ],
     groupleader: {
         type: Schema.Types.ObjectId,
@@ -13,12 +13,12 @@ const groupSchema = new Schema({
     projectId: {
         type: Schema.Types.ObjectId,
         ref: 'Project',
-        required: true
+        required: false
     },
-    projectName: { type: String, required: true },
+    projectName: { type: String, required: false },
     semester: { type: String, required: true },
     collegeId: {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: 'College',
         required: true
     },

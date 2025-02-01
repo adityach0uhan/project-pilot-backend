@@ -1,34 +1,16 @@
-import { Request, Response } from 'express';
 import TeacherModel from '../schema/teacher.schema.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import sendEmail from '../utils/sendEmail.js';
-
-export const teacherRegister = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const teacherRegister = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
         return;
     }
     try {
-        const {
-            name,
-            profilePic,
-            email,
-            department,
-            password,
-            designation,
-            employeeId,
-            teacherId,
-            gender,
-            branch,
-            collegeId,
-            isHOD
-        } = req.body;
+        const { name, profilePic, email, department, password, designation, employeeId, teacherId, gender, branch, collegeId, isHOD } = req.body;
         const hashedPassword = await bcrypt.hash(password, 12);
         const teacher = await TeacherModel.create({
             name,
@@ -50,7 +32,8 @@ export const teacherRegister = async (
             success: true,
             message: 'Teacher registered successfully Redirecting to login page'
         });
-    } catch (error: any) {
+    }
+    catch (error) {
         res.status(500).json({
             message: 'Internal server error while registering teacher',
             error: error.message,
@@ -58,11 +41,7 @@ export const teacherRegister = async (
         });
     }
 };
-
-export const teacherLogin = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const teacherLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         const teacher = await TeacherModel.findOne({ email });
@@ -73,10 +52,7 @@ export const teacherLogin = async (
             });
             return;
         }
-        const isPasswordValid = await bcrypt.compare(
-            password,
-            teacher.password
-        );
+        const isPasswordValid = await bcrypt.compare(password, teacher.password);
         if (!isPasswordValid) {
             res.status(401).json({
                 message: 'Invalid Id or Password',
@@ -84,16 +60,11 @@ export const teacherLogin = async (
             });
             return;
         }
-        const token = jwt.sign(
-            {
-                id: teacher._id,
-                role: teacher.role,
-                collegeId: teacher.collegeId
-            },
-            process.env.JWT_SECRET_KEY!,
-            { expiresIn: '15d' }
-        );
-
+        const token = jwt.sign({
+            id: teacher._id,
+            role: teacher.role,
+            collegeId: teacher.collegeId
+        }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
         res.cookie('project_pilot_token', token, {
             httpOnly: true,
             secure: true,
@@ -102,11 +73,12 @@ export const teacherLogin = async (
         })
             .status(200)
             .json({
-                message: 'Logged in successfully',
-                success: true,
-                data: teacher
-            });
-    } catch (error: any) {
+            message: 'Logged in successfully',
+            success: true,
+            data: teacher
+        });
+    }
+    catch (error) {
         res.status(500).json({
             message: 'Internal server error',
             error: error.message,
@@ -114,13 +86,8 @@ export const teacherLogin = async (
         });
     }
 };
-
 //TODO: Check Below functions
-
-export const teacherOtpGenerate = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const teacherOtpGenerate = async (req, res) => {
     try {
         const { email } = req.body;
         const teacher = await TeacherModel.findOne({ email });
@@ -129,31 +96,22 @@ export const teacherOtpGenerate = async (
             return;
         }
         const otp = Math.floor(100000 + Math.random() * 900000);
-        await sendEmail(
-            email,
-            'Student Project Manager!  Password reset OTP ',
-            `Your OTP is ${otp} , will be expired within 5 minutes kindly ignore if you didn't request it`
-        );
+        await sendEmail(email, 'Student Project Manager!  Password reset OTP ', `Your OTP is ${otp} , will be expired within 5 minutes kindly ignore if you didn't request it`);
         teacher.otp = otp.toString();
         teacher.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
         await teacher.save();
-
         res.status(200).json({ message: 'OTP sent successfully' });
-    } catch (error: any) {
+    }
+    catch (error) {
         res.status(500).json({
             message: 'Internal server error',
             error: error.message
         });
     }
 }; //TODO:Create OTP Generation Limit
-
-export const teacherForgetPassword = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const teacherForgetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
-
         const teacher = await TeacherModel.findOne({ email });
         if (otp.length !== 6) {
             res.status(400).json({ message: '6 Digit OTP is Required' });
@@ -167,7 +125,7 @@ export const teacherForgetPassword = async (
             res.status(400).json({ message: 'Invalid OTP' });
             return;
         }
-        if (new Date() > teacher.otpExpiry!) {
+        if (new Date() > teacher.otpExpiry) {
             res.status(400).json({ message: 'OTP expired' });
             return;
         }
@@ -177,21 +135,17 @@ export const teacherForgetPassword = async (
         // teacher.otpExpiry = undefined;
         await teacher.save();
         res.status(200).json({
-            message:
-                'Password reset successfully Login with your new password and correct email'
+            message: 'Password reset successfully Login with your new password and correct email'
         });
-    } catch (error: any) {
+    }
+    catch (error) {
         res.status(500).json({
             message: 'Internal server error',
             error: error.message
         });
     }
 };
-
-export const teacherChangePassword = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const teacherChangePassword = async (req, res) => {
     try {
         const { email, oldPassword, newPassword } = req.body;
         const teacher = await TeacherModel.findOne({ email });
@@ -199,10 +153,7 @@ export const teacherChangePassword = async (
             res.status(404).json({ message: 'Teacher not found' });
             return;
         }
-        const isPasswordValid = await bcrypt.compare(
-            oldPassword,
-            teacher.password
-        );
+        const isPasswordValid = await bcrypt.compare(oldPassword, teacher.password);
         if (!isPasswordValid) {
             res.status(400).json({ message: 'Invalid old password' });
             return;
@@ -211,7 +162,8 @@ export const teacherChangePassword = async (
         teacher.password = hashedPassword;
         await teacher.save();
         res.status(200).json({ message: 'Password changed successfully' });
-    } catch (error: any) {
+    }
+    catch (error) {
         res.status(500).json({
             message: 'Internal server error',
             error: error.message
