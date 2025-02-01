@@ -5,7 +5,7 @@ import { IProject } from './project.schema.js'; // reference to project
 export interface IGroup extends Document {
     name: string;
     groupNumber: string;
-    collegeId: Schema.Types.ObjectId;
+    collegeId: string;
     members: Schema.Types.ObjectId[];
     groupleader: Schema.Types.ObjectId;
     semester: string;
@@ -21,7 +21,7 @@ const groupSchema = new Schema<IGroup>(
         name: { type: String, required: true },
         groupNumber: { type: String, required: true },
         members: [
-            { type: Schema.Types.ObjectId, ref: 'Student', required: true }
+            { type: Schema.Types.ObjectId, ref: 'Student', required: false }
         ],
         groupleader: {
             type: Schema.Types.ObjectId,
@@ -31,12 +31,12 @@ const groupSchema = new Schema<IGroup>(
         projectId: {
             type: Schema.Types.ObjectId,
             ref: 'Project',
-            required: true
+            required: false
         },
-        projectName: { type: String, required: true },
+        projectName: { type: String, required: false },
         semester: { type: String, required: true },
         collegeId: {
-            type: Schema.Types.ObjectId,
+            type: String,
             ref: 'College',
             required: true
         },
