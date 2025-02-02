@@ -17,9 +17,7 @@ const allowedOrigins = [
     'http://localhost:3000',
     'https://projectpilot.vercel.app'
 ];
-
-// ✅ CORS Configuration (With Dynamic Origin Handling)
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers.origin as string;
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -33,12 +31,14 @@ app.use((req, res, next) => {
         );
         res.setHeader('Access-Control-Allow-Credentials', 'true');
     }
-    next();
-});
 
-// ✅ Proper Preflight Handling
-app.options('*', (req, res) => {
-    res.status(200).json({ message: 'Preflight OK' });
+    // ✅ Fix: Ensure TypeScript knows we always return a response or call `next()`
+    if (req.method === 'OPTIONS') {
+        res.status(200).send(); // Return response for OPTIONS preflight
+        return; // Explicitly return to stop execution
+    }
+
+    next(); // Ensure `next()` is always called
 });
 
 // ✅ Middleware Order (IMPORTANT)
