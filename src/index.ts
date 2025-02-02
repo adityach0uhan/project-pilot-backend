@@ -18,10 +18,9 @@ app.use(cookieParser());
 
 const allowedOrigins = [
     'http://localhost:3000',
-    'http://localhost:3000/',
-    'https://projectpilot.vercel.app/',
     'https://projectpilot.vercel.app'
 ];
+
 app.use(
     cors({
         origin: allowedOrigins,
@@ -30,6 +29,10 @@ app.use(
         credentials: true
     })
 );
+
+//for preflight requests
+app.options('*', cors());
+
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err.name === 'Error' && err.message.includes('CORS')) {
         res.status(403).json({ message: 'CORS Error: Access Denied' });
@@ -41,25 +44,16 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     }
 });
 
+// Routes
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Project Pilot API ' });
 });
 
-// combined auth routes for every user (student, teacher, college, superadmin)
 app.use('/api/v1/auth', authRouter);
-
-//Route for college admin dashboard
 app.use('/api/v1/college', collegeRouter);
-
-//Route for super admin dashboard
 app.use('/api/v1/superadmin/', superAdminRouter);
-
-//ALL Route related to  projects
 app.use('/api/v1/:collegeId/projects', projectRouter);
-
-//ALL Route related to  groups
 app.use('/api/v1/:collegeId/group', groupRouter);
-
 app.use('/api/v1/:collegeId/notification', notificationRouter);
 
 // PORT and DB connection
