@@ -19,7 +19,8 @@ app.use(cookieParser());
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3000/',
-    'https://projectpilot.vercel.app/'
+    'https://projectpilot.vercel.app/',
+    'https://projectpilot.vercel.app'
 ];
 app.use(
     cors({
