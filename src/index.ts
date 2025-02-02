@@ -23,6 +23,9 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
+// preflight
+app.options('*', cors(corsOptions));
+
 app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
