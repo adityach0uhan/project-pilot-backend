@@ -21,4 +21,9 @@ const notificationSchema = new Schema<INotification>(
     { timestamps: true }
 );
 
-const CollegeModel = model<INotification>('Notification', notificationSchema);
+const NotificationModel = model<INotification>(
+    'Notification',
+    notificationSchema
+);
+
+export default NotificationModel;
