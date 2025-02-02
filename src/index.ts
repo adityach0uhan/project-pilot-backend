@@ -20,7 +20,11 @@ const app: Application = express();
 const corsOptions = {
     origin: 'https://projectpilot.vercel.app',
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    preflightContinue: true,
+    maxAge: 3600
 };
 
 // preflight
