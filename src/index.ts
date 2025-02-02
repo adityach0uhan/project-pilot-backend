@@ -12,41 +12,23 @@ import notificationRouter from './routes/notification.router.js';
 
 const app: Application = express();
 
-// ✅ Allowed Origins
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://projectpilot.vercel.app'
-];
-app.use((req: Request, res: Response, next: NextFunction) => {
-    const origin = req.headers.origin as string;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader(
-            'Access-Control-Allow-Methods',
-            'GET,HEAD,PUT,PATCH,POST,DELETE'
-        );
-        res.setHeader(
-            'Access-Control-Allow-Headers',
-            'Content-Type, Authorization'
-        );
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-    }
+// const allowedOrigins = [
+//     'http://localhost:3000',
+//     'https://projectpilot.vercel.app'
+// ];
 
-    // ✅ Fix: Ensure TypeScript knows we always return a response or call `next()`
-    if (req.method === 'OPTIONS') {
-        res.status(200).send(); // Return response for OPTIONS preflight
-        return; // Explicitly return to stop execution
-    }
+const corsOptions = {
+    origin: 'https://projectpilot.vercel.app',
+    credentials: true,
+    optionsSuccessStatus: 200
+};
 
-    next(); // Ensure `next()` is always called
-});
+app.use(cors());
 
-// ✅ Middleware Order (IMPORTANT)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Routes
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Project Pilot API is running 🚀' });
 });
@@ -58,7 +40,6 @@ app.use('/api/v1/:collegeId/projects', projectRouter);
 app.use('/api/v1/:collegeId/group', groupRouter);
 app.use('/api/v1/:collegeId/notification', notificationRouter);
 
-// ✅ Global Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
     res.status(err.status || 500).json({
@@ -66,7 +47,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
     try {
