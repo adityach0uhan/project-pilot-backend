@@ -11,16 +11,16 @@ const projectSchema = new Schema({
     groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true }, // Reference to group
     status: {
         type: String,
-        enum: ['pending', 'submitted', 'graded'],
-        default: 'pending'
-    }, // Default status
+        default: 'Started'
+    },
     grade: { type: String, required: false },
     presentationUrl: { type: String, required: false },
     documentUrl: { type: String, required: false },
     synopsisUrl: { type: String, required: false },
     teacherRemarks: { type: String, required: false },
     branch: { type: String, required: true },
-    semester: { type: String, required: true }
+    semester: { type: String, required: true },
+    groupNumber: { type: String, required: true }
 }, { timestamps: true });
 const ProjectModel = model('Project', projectSchema);
 export default ProjectModel;

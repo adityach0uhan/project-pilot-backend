@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
     getAllProjects,
     createNewProject,
-    getProjectById,
+    getProjectByGroupNumber,
     updateProject,
     deleteProject,
     getProjectsByGroupId
@@ -11,9 +11,8 @@ const router = Router();
 
 router.post('/create', createNewProject);
 router.get('/all', getAllProjects);
-router.get('//:projectId', getProjectById);
+router.post('/getProjectByGroupNumber', getProjectByGroupNumber);
 router.put('/:projectId', updateProject);
 router.delete('/:projectId', deleteProject);
-router.get('/group/:groupId', getProjectsByGroupId);
 
 export default router;

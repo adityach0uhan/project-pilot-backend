@@ -1,14 +1,51 @@
 import { Request, Response } from 'express';
 import ProjectModel from '../schema/project.schema.js';
+import GroupModel from '../schema/group.schema.js';
 
 export const createNewProject = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        const project = new ProjectModel(req.body);
+        const {
+            collegeId,
+            projectName,
+            description,
+            createdBy,
+            groupNumber,
+            status,
+            branch,
+            semester
+        } = req.body;
+
+        const group: any = await GroupModel.findOne({ groupNumber });
+        if (!group) {
+            res.status(404).json({
+                success: false,
+                message: 'Group not found',
+                groupNumber
+            });
+            return;
+        }
+
+        const project = new ProjectModel({
+            collegeId,
+            projectName,
+            description,
+            createdBy,
+            groupNumber,
+            status,
+            groupId: group._id,
+            branch,
+            semester
+        });
         await project.save();
-        res.status(201).json(project);
+
+        group.projectId = project._id;
+        group.projectName = projectName;
+        await group.save();
+
+        res.status(201).json({ success: true, project, group });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }
@@ -19,26 +56,31 @@ export const getAllProjects = async (
     res: Response
 ): Promise<void> => {
     try {
-        const projects = await ProjectModel.find();
-        res.status(200).json(projects);
+        const { collegeId, branch } = req.params;
+        const projects = await ProjectModel.find({ collegeId, branch });
+        res.status(200).json({ success: true, projects });
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
-export const getProjectById = async (
+export const getProjectByGroupNumber = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        const project = await ProjectModel.findById(req.params.projectId);
+        const { groupNumber } = req.body;
+        const project = await ProjectModel.findOne({ groupNumber });
         if (!project) {
-            res.status(404).json({ message: 'Project not found' });
+            res.status(404).json({
+                success: false,
+                message: 'Project not found'
+            });
             return;
         }
-        res.status(200).json(project);
+        res.status(200).json({ success: true, project });
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 

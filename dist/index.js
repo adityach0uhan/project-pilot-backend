@@ -8,7 +8,6 @@ import superAdminRouter from './routes/superadmin.router.js';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import collegeRouter from './routes/college.router.js';
-import verifyToken from './middlewares/verifyToken.js';
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -41,7 +40,7 @@ app.use('/api/v1/college', collegeRouter);
 //Route for super admin dashboard
 app.use('/api/v1/superadmin/', superAdminRouter);
 //ALL Route related to  projects
-app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
+app.use('/api/v1/:collegeId/projects', projectRouter);
 //ALL Route related to  groups
 app.use('/api/v1/:collegeId/group', groupRouter);
 // PORT and DB connection

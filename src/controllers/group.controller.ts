@@ -87,8 +87,9 @@ export const requestToJoinGroup = async (
 ): Promise<void> => {
     try {
         const { collegeId, inviteCode } = req.params;
+        console.log('Group params', req.params);
         const { userId } = req.body;
-        const group: any = await GroupModel.find({ inviteCode });
+        const group: any = await GroupModel.findOne({ inviteCode });
 
         if (!group) {
             res.status(404).json({
@@ -145,8 +146,6 @@ export const makeGroupRequestAcceptOrReject = async (
             res.status(404).json({ message: 'Group not found' });
             return;
         }
-
-        // Ensure the current user is the group leader
         if (group.groupleader.toString() !== currentUserId) {
             res.status(403).json({
                 message: 'Only the group leader can manage requests',
@@ -362,8 +361,19 @@ export const kickMember = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { groupId, memberId } = req.params;
-        //TODO: Add check if the user is the group leader or the creator of the group
+        const { collegeId, groupId, memberId } = req.params;
+        const userIsLeader = await GroupModel.findOne({
+            _id: groupId,
+            groupleader: memberId
+        });
+
+        if (userIsLeader) {
+            res.status(403).json({
+                message: 'Group leader cannot be kicked',
+                success: false
+            });
+            return;
+        }
         const group = await GroupModel.findByIdAndUpdate(
             groupId,
             {
@@ -371,7 +381,10 @@ export const kickMember = async (
             },
             { new: true }
         );
-
+        const updateStudentTeamId = await StudentModel.findByIdAndUpdate(
+            memberId,
+            { teamId: null }
+        );
         if (!group) {
             res.status(404).json({ message: 'Group not found' });
             return;

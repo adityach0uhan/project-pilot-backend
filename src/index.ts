@@ -49,7 +49,7 @@ app.use('/api/v1/college', collegeRouter);
 app.use('/api/v1/superadmin/', superAdminRouter);
 
 //ALL Route related to  projects
-app.use('/api/v1/:collegeId/projects', verifyToken, projectRouter);
+app.use('/api/v1/:collegeId/projects', projectRouter);
 
 //ALL Route related to  groups
 app.use('/api/v1/:collegeId/group', groupRouter);
