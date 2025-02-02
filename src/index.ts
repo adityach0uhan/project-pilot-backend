@@ -9,6 +9,7 @@ import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import collegeRouter from './routes/college.router.js';
 import verifyToken from './middlewares/verifyToken.js';
+import notificationRouter from './routes/notification.router.js';
 const app: Application = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -53,6 +54,8 @@ app.use('/api/v1/:collegeId/projects', projectRouter);
 
 //ALL Route related to  groups
 app.use('/api/v1/:collegeId/group', groupRouter);
+
+app.use('/api/v1/:collegeId/notification', notificationRouter);
 
 // PORT and DB connection
 const PORT = process.env.PORT || 5000;

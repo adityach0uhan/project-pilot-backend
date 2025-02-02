@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
 
-export interface ICollege extends Document {
+export interface INotification extends Document {
     collegeId: string;
     heading: string;
     description: string;
@@ -9,7 +9,7 @@ export interface ICollege extends Document {
     postedBy: string;
 }
 
-const collegeSchema = new Schema<ICollege>(
+const notificationSchema = new Schema<INotification>(
     {
         collegeId: { type: String, required: true },
         heading: { type: String, required: true },
@@ -21,4 +21,4 @@ const collegeSchema = new Schema<ICollege>(
     { timestamps: true }
 );
 
-const CollegeModel = model<ICollege>('College', collegeSchema);
+const CollegeModel = model<INotification>('Notification', notificationSchema);
