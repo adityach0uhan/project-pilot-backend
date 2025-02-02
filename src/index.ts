@@ -12,77 +12,45 @@ import notificationRouter from './routes/notification.router.js';
 
 const app: Application = express();
 
-// ✅ CORS Configuration
+// ✅ Allowed Origins
 const allowedOrigins = [
     'http://localhost:3000',
     'https://projectpilot.vercel.app'
 ];
 
-app.use(
-    cors({
-        origin: allowedOrigins,
-        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true
-    })
-);
-
-// ✅ Preflight Request Handling
-app.options('*', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
-    res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET,HEAD,PUT,PATCH,POST,DELETE'
-    );
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Authorization'
-    );
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.status(204).end();
-});
-
-// ✅ Express Middleware (Keep Order Proper)
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cookieParser());
-
-// ✅ Dynamic CORS Middleware for Route-Based Access
+// ✅ CORS Configuration (With Dynamic Origin Handling)
 app.use((req, res, next) => {
     const origin = req.headers.origin as string;
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader(
+            'Access-Control-Allow-Methods',
+            'GET,HEAD,PUT,PATCH,POST,DELETE'
+        );
+        res.setHeader(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization'
+        );
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
     }
-    res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET,HEAD,PUT,PATCH,POST,DELETE'
-    );
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Content-Type, Authorization'
-    );
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
     next();
 });
 
-// ✅ Error Handling Middleware
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    if (err.name === 'Error' && err.message.includes('CORS')) {
-        res.status(403).json({ message: 'CORS Error: Access Denied' });
-    } else {
-        console.error(err);
-        res.status(err.status || 500).json({
-            message: err.message || 'Internal Server Error'
-        });
-    }
+// ✅ Proper Preflight Handling
+app.options('*', (req, res) => {
+    res.status(200).json({ message: 'Preflight OK' });
 });
 
-// ✅ Base API Route
+// ✅ Middleware Order (IMPORTANT)
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Routes
 app.get('/', (req: Request, res: Response) => {
     res.json({ message: 'Project Pilot API is running 🚀' });
 });
 
-// ✅ API Routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/college', collegeRouter);
 app.use('/api/v1/superadmin/', superAdminRouter);
@@ -90,7 +58,15 @@ app.use('/api/v1/:collegeId/projects', projectRouter);
 app.use('/api/v1/:collegeId/group', groupRouter);
 app.use('/api/v1/:collegeId/notification', notificationRouter);
 
-// ✅ Start Server with Database Connection
+// ✅ Global Error Handling
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal Server Error'
+    });
+});
+
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
     try {
