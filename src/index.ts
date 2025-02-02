@@ -12,25 +12,14 @@ import notificationRouter from './routes/notification.router.js';
 
 const app: Application = express();
 
-// const allowedOrigins = [
-//     'http://localhost:3000',
-//     'https://projectpilot.vercel.app'
-// ];
-
-const corsOptions = {
-    origin: 'https://projectpilot.vercel.app',
-    credentials: true,
-    optionsSuccessStatus: 200,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    preflightContinue: true,
-    maxAge: 3600
-};
-
-// preflight
-app.options('*', cors(corsOptions));
-
-app.use(cors(corsOptions));
+app.use(
+    cors({
+        origin: 'https://projectpilot.vercel.app',
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true // Allow credentials (cookies, etc.)
+    })
+);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -47,6 +36,7 @@ app.use('/api/v1/:collegeId/projects', projectRouter);
 app.use('/api/v1/:collegeId/group', groupRouter);
 app.use('/api/v1/:collegeId/notification', notificationRouter);
 
+// Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
     res.status(err.status || 500).json({
@@ -54,6 +44,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
+// Start server and connect to DB
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
     try {
