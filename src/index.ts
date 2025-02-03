@@ -17,7 +17,7 @@ app.use(
         origin: 'https://projectpilot.vercel.app',
         methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true // Allow credentials (cookies, etc.)
+        credentials: true
     })
 );
 
