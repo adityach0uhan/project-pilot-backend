@@ -70,28 +70,33 @@ export const superAdminLogin = async (
             return;
         }
 
+        const secret = process.env.JWT_SECRET_KEY;
+        if (!secret) {
+            throw new Error('JWT Secret key not found');
+        }
+
         const token = jwt.sign(
             {
                 id: superadmin._id,
                 role: superadmin.role
             },
-            process.env.JWT_SECRET_KEY!,
-            { expiresIn: '15d' }
+            secret,
+            { expiresIn: '2d' }
         );
 
         res.cookie('project_pilot_token', token, {
             httpOnly: true,
             secure: true,
-            maxAge: 15 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000,
             sameSite: 'none'
-        })
-            .status(200)
-            .json({
-                message: ' SuperAdmin Logged in successfully',
-                data: superadmin,
-                success: true,
-                token
-            });
+        });
+        res.status(200).json({
+            message: ' SuperAdmin Logged in successfully',
+            data: superadmin,
+            success: true,
+            token
+        });
+        return;
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error while logging in superadmin',

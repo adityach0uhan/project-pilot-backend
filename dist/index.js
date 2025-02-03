@@ -14,6 +14,7 @@ app.use(cors({
     origin: 'https://projectpilot.vercel.app',
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Set-Cookie'],
     credentials: true
 }));
 app.use(express.urlencoded({ extended: true }));

@@ -84,28 +84,32 @@ export const teacherLogin = async (
             });
             return;
         }
+
+        const secret = process.env.JWT_SECRET_KEY;
+        if (!secret) {
+            throw new Error(' JWT secret key not found');
+        }
         const token = jwt.sign(
             {
                 id: teacher._id,
                 role: teacher.role,
                 collegeId: teacher.collegeId
             },
-            process.env.JWT_SECRET_KEY!,
-            { expiresIn: '15d' }
+            secret,
+            { expiresIn: '2d' }
         );
 
         res.cookie('project_pilot_token', token, {
             httpOnly: true,
             secure: true,
-            maxAge: 15 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
             sameSite: 'none'
-        })
-            .status(200)
-            .json({
-                message: 'Logged in successfully',
-                success: true,
-                data: teacher
-            });
+        });
+        res.status(200).json({
+            message: 'Logged in successfully',
+            success: true,
+            data: teacher
+        });
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',

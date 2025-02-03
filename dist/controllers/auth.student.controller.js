@@ -60,24 +60,28 @@ export const studentLogin = async (req, res) => {
             });
             return;
         }
+        const secret = process.env.JWT_SECRET_KEY;
+        if (!secret) {
+            throw new Error('JWT Secret Key is not defined');
+        }
         const token = jwt.sign({
             id: student._id,
             role: student.role,
             collegeId: student.collegeId
-        }, process.env.JWT_SECRET_KEY, { expiresIn: '15d' });
+        }, secret, { expiresIn: '2d' });
         res.cookie('project_pilot_token', token, {
             httpOnly: true,
             secure: true,
-            maxAge: 15 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
             sameSite: 'none'
-        })
-            .status(200)
-            .json({
-            message: 'Student Logged in successfully',
+        });
+        res.status(200).json({
+            message: 'Student logged in successfully',
             data: student,
             success: true,
             token
         });
+        return;
     }
     catch (error) {
         res.status(500).json({

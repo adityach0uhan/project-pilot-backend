@@ -57,6 +57,13 @@ export const collegeLogin = async (
 ): Promise<void> => {
     try {
         const { email, password, passkey } = req.body;
+        if (!email || !password || !passkey) {
+            res.status(400).json({
+                message: 'Email, Password and Passkey are required',
+                success: false
+            });
+            return;
+        }
         const college = await CollegeModel.findOne({ email });
         if (!college) {
             res.status(404).json({
@@ -68,7 +75,7 @@ export const collegeLogin = async (
 
         if (college.passkey !== passkey) {
             res.status(401).json({
-                message: 'Invalid Id or Password',
+                message: 'Invalid Id or Password/Passkey',
                 success: false
             });
             return;
@@ -85,28 +92,36 @@ export const collegeLogin = async (
             });
             return;
         }
+        const jwtSecret = process.env.JWT_SECRET_KEY;
+        if (!jwtSecret) {
+            throw new Error(
+                'JWT_SECRET_KEY is not defined in environment variables.'
+            );
+        }
+
         const token = jwt.sign(
             {
                 id: college._id,
                 role: college.role,
                 collegeId: college.collegeId
             },
-            process.env.JWT_SECRET_KEY!,
-            { expiresIn: '15d' }
+            jwtSecret,
+            { expiresIn: '2d' }
         );
 
         res.cookie('project_pilot_token', token, {
             httpOnly: true,
             secure: true,
-            maxAge: 15 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000,
             sameSite: 'none'
-        })
-            .status(200)
-            .json({
-                message: 'Logged in successfully',
-                success: true,
-                data: college
-            });
+        });
+
+        res.status(200).json({
+            message: 'Logged in successfully',
+            success: true,
+            data: college
+        });
+        return;
     } catch (error: any) {
         res.status(500).json({
             message: 'Internal server error',
