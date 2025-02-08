@@ -9,11 +9,12 @@ export interface ITeacher extends Document {
     teacherId: string;
     branch: string;
     collegeId: string;
+    semester: string;
+    section: string;
     gender: string;
     otp: string;
     otpExpiry: Date;
     role: string;
-    isHOD: boolean;
     collegeName: string;
 }
 
@@ -31,7 +32,6 @@ const teacherSchema = new Schema<ITeacher>(
         collegeId: { type: String, required: true }, // Multi-tenant identifier
         gender: { type: String, required: true },
         collegeName: { type: String, required: false },
-        isHOD: { type: Boolean, required: true, default: false },
         profilePic: { type: String, required: false }
     },
     { timestamps: true }
