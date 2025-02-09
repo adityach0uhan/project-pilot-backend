@@ -51,7 +51,7 @@ app.use('/api/v1/superadmin/', superAdminRouter);
 app.use('/api/v1/teacher', teacherRouter);
 app.use('/api/v1/:collegeId/projects', projectRouter);
 app.use('/api/v1/:collegeId/group', groupRouter);
-app.use('/api/v1/:collegeId/notification', notificationRouter);
+app.use('/api/v1/notification', notificationRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err);
