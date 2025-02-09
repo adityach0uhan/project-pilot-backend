@@ -222,3 +222,63 @@ export const teacherChangePassword = async (
         });
     }
 };
+
+export const updateTeacher = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    const { _id } = req.params;
+    try {
+        const { name, email, gender, branch, semester, teacherId } = req.body;
+
+        const teacher = await TeacherModel.findOneAndUpdate(
+            { _id },
+            {
+                name,
+                email,
+                gender,
+                branch,
+                semester,
+                teacherId
+            },
+            { new: true }
+        );
+
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Teacher updated successfully',
+            teacher
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};
+
+export const deleteTeacher = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    const { _id } = req.params;
+    try {
+        const teacher = await TeacherModel.findByIdAndDelete({ _id });
+        if (!teacher) {
+            res.status(404).json({ message: 'Teacher not found' });
+            return;
+        }
+        res.status(200).json({ message: 'Teacher deleted successfully' });
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+};

@@ -12,7 +12,6 @@ const teacherSchema = new Schema({
     collegeId: { type: String, required: true }, // Multi-tenant identifier
     gender: { type: String, required: true },
     collegeName: { type: String, required: false },
-    isHOD: { type: Boolean, required: true, default: false },
     profilePic: { type: String, required: false }
 }, { timestamps: true });
 const TeacherModel = model('Teacher', teacherSchema);
