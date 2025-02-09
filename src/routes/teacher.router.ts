@@ -2,6 +2,10 @@ import { Router } from 'express';
 import StudentModel from '../schema/student.schema.js';
 import ProjectModel from '../schema/project.schema.js';
 import GroupModel from '../schema/group.schema.js';
+import {
+    deleteTeacher,
+    updateTeacher
+} from '../controllers/auth.teacher.controller.js';
 
 const router = Router();
 
@@ -75,5 +79,8 @@ router.get('/group/:groupId', async (req, res) => {
         message: 'Group Data fetched successfully'
     });
 });
+
+router.put('/:_id', updateTeacher);
+router.delete('/:_id', deleteTeacher);
 
 export default router;
